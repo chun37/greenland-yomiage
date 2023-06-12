@@ -1,7 +1,6 @@
 package tts
 
 import (
-	"context"
 	"fmt"
 )
 
@@ -11,6 +10,6 @@ func NewUsecase() *Usecase {
 	return &Usecase{}
 }
 
-func (u *Usecase) Do(_ context.Context, messageText string) {
+func (u *Usecase) Do(messageText string) {
 	fmt.Println(messageText)
 }

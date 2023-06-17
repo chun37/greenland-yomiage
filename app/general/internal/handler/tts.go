@@ -36,7 +36,6 @@ func (h *Handler) TTS(messages chan speaker.SpeechMessage) func(s *discordgo.Ses
 			return nil
 		}()
 		if vs == nil {
-			log.Println("failed to get voice state:", err)
 			return
 		}
 

@@ -11,6 +11,6 @@ type Usecases struct {
 
 func NewUsecases(cfg config.Config) Usecases {
 	uc := new(Usecases)
-	uc.TTSUsecase = tts.NewUsecase(tts.Config{TargetChannelID: cfg.TargetChannelID})
+	uc.TTSUsecase = tts.NewUsecase(tts.Config{TargetChannelID: cfg.TargetChannelID}, tts.Dependencies{})
 	return *uc
 }

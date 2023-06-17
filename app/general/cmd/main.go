@@ -16,15 +16,10 @@ import (
 var (
 	Token string
 )
-var buffer = make([][]byte, 0)
 
 func init() {
 	flag.StringVar(&Token, "t", "", "Bot Token")
 	flag.Parse()
-	err := loadSound()
-	if err != nil {
-		return
-	}
 }
 
 func main() {
@@ -38,7 +33,6 @@ func main() {
 	// Register the messageCreate func as a callback for MessageCreate events.
 	dg.AddHandler(handler.TTS)
 	dg.AddHandler(handler.Play)
-	dg.AddHandler(handler.AirHorn(buffer))
 
 	// In this example, we only care about receiving message events.
 	dg.Identify.Intents = discordgo.IntentsAll

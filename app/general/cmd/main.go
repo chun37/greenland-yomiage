@@ -25,7 +25,6 @@ func init() {
 }
 
 func main() {
-
 	// Create a new Discord session using the provided bot token.
 	dg, err := discordgo.New("Bot " + Token)
 	if err != nil {
@@ -34,9 +33,11 @@ func main() {
 
 	// Register the messageCreate func as a callback for MessageCreate events.
 
-	cfg := config.Config{}
-	usecases := initialize.NewUsecases(cfg)
-	hp := initialize.NewHandlerProps(usecases)
+	cfg := config.Config{
+		TargetChannelID: "773181736988573697",
+	}
+	usecases := initialize.NewUsecases()
+	hp := initialize.NewHandlerProps(usecases, cfg)
 	hdr := handler.NewHandler(hp)
 	dg.AddHandler(hdr.TTS)
 	dg.AddHandler(hdr.Play)

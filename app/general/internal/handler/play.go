@@ -127,7 +127,7 @@ func Encode(src io.Reader, chunks OpusChunks, done chan struct{}) error {
 	return nil
 }
 
-// PlayAudioFile will play the given filename to the already connected
+// Play will play the given filename to the already connected
 // Discord voice server/channel.  voice websocket and udp socket
 // must already be setup before this will work.
 func PlayAudioFile(v *discordgo.VoiceConnection, chunks OpusChunks, encodeClose chan struct{}) error {

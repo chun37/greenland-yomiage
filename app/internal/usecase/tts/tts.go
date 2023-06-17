@@ -4,10 +4,16 @@ import (
 	"fmt"
 )
 
-type Usecase struct{}
+type Config struct {
+	TargetChannelID string
+}
 
-func NewUsecase() *Usecase {
-	return &Usecase{}
+type Usecase struct {
+	cfg Config
+}
+
+func NewUsecase(cfg Config) *Usecase {
+	return &Usecase{cfg: cfg}
 }
 
 func (u *Usecase) Do(messageText string) {

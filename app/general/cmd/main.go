@@ -9,7 +9,9 @@ import (
 	"syscall"
 
 	"github.com/bwmarrin/discordgo"
+	config "github.com/chun37/greenland-yomiage/general/internal/config"
 	"github.com/chun37/greenland-yomiage/general/internal/handler"
+	"github.com/chun37/greenland-yomiage/general/internal/initialize"
 )
 
 // Variables used for command line parameters
@@ -31,8 +33,13 @@ func main() {
 	}
 
 	// Register the messageCreate func as a callback for MessageCreate events.
-	dg.AddHandler(handler.TTS)
-	dg.AddHandler(handler.Play)
+
+	cfg := config.Config{}
+	usecases := initialize.NewUsecases(cfg)
+	hp := initialize.NewHandlerProps(usecases)
+	hdr := handler.NewHandler(hp)
+	dg.AddHandler(hdr.TTS)
+	dg.AddHandler(hdr.Play)
 
 	// In this example, we only care about receiving message events.
 	dg.Identify.Intents = discordgo.IntentsAll

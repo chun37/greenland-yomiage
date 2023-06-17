@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"bufio"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -11,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bwmarrin/dgvoice"
 	"github.com/bwmarrin/discordgo"
+	"layeh.com/gopus"
 )
 
 func (h *Handler) Play(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -55,14 +54,21 @@ func (h *Handler) Play(s *discordgo.Session, m *discordgo.MessageCreate) {
 					fmt.Println("failed to open file", err)
 					return
 				}
-				pr, pw := io.Pipe()
-				encodeProcess, err := Encode(f, pw)
-				defer encodeProcess.Kill()
+				done := make(chan struct{})
+				opusChunks := make(OpusChunks, 3)
+				defer close(done)
+				defer close(opusChunks)
+				go func() {
+					err := Encode(f, opusChunks, done)
+					if err != nil {
+
+					}
+				}()
 				if err != nil {
 					fmt.Println("failed to encode audio", err)
 					return
 				}
-				err = PlayAudioFile(dgv, pr)
+				err = PlayAudioFile(dgv, opusChunks, done)
 				if err != nil {
 					fmt.Println("failed to play audio files", err)
 					return
@@ -75,33 +81,56 @@ func (h *Handler) Play(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 const (
-	channels  int = 2     // 1 for mono, 2 for stereo
-	frameRate int = 48000 // audio sampling rate
-	frameSize int = 960   // uint16 size of each audio frame
+	channels  int = 2                   // 1 for mono, 2 for stereo
+	frameRate int = 48000               // audio sampling rate
+	frameSize int = 960                 // uint16 size of each audio frame
+	maxBytes  int = (frameSize * 2) * 2 // max size of opus data
 )
 
-func Encode(src io.Reader, dst io.Writer) (*os.Process, error) {
+type OpusChunks = chan []byte
+
+func Encode(src io.Reader, chunks OpusChunks, done chan struct{}) error {
 	run := exec.Command("ffmpeg", "-i", "pipe:0", "-f", "s16le", "-ar", strconv.Itoa(frameRate), "-ac", strconv.Itoa(channels), "pipe:1")
 	run.Stdin = src
-	run.Stdout = dst
+	dst, err := run.StdoutPipe()
 
-	err := run.Start()
+	err = run.Start()
 	if err != nil {
 		fmt.Println("RunStart Error", err)
-		return nil, err
+		return err
 	}
 
-	return run.Process, nil
+	defer run.Process.Kill()
+
+	opusEncoder, err := gopus.NewEncoder(frameRate, channels, gopus.Audio)
+
+	for {
+		// read data from ffmpeg stdout
+		pcm := make([]int16, frameSize*channels)
+		err = binary.Read(dst, binary.LittleEndian, &pcm)
+		if err == io.EOF || err == io.ErrUnexpectedEOF {
+			break
+		}
+		if err != nil {
+			fmt.Println("error reading from ffmpeg stdout", err)
+			break
+		}
+		opus, err := opusEncoder.Encode(pcm, frameSize, maxBytes)
+		if err != nil {
+			fmt.Println("opus encode error", err)
+		}
+		chunks <- opus
+	}
+
+	done <- struct{}{}
+
+	return nil
 }
 
 // PlayAudioFile will play the given filename to the already connected
 // Discord voice server/channel.  voice websocket and udp socket
 // must already be setup before this will work.
-func PlayAudioFile(v *discordgo.VoiceConnection, reader io.Reader) error {
-	buf := bufio.NewReaderSize(reader, 16384)
-
-	//=======
-	// Send "speaking" packet over the voice websocket
+func PlayAudioFile(v *discordgo.VoiceConnection, chunks OpusChunks, encodeClose chan struct{}) error {
 	err := v.Speaking(true)
 	if err != nil {
 		fmt.Println("Couldn't set speaking", err)
@@ -115,31 +144,11 @@ func PlayAudioFile(v *discordgo.VoiceConnection, reader io.Reader) error {
 		}
 	}()
 
-	send := make(chan []int16, 2)
-	defer close(send)
-
-	close := make(chan bool)
-	go func() {
-		dgvoice.SendPCM(v, send)
-		close <- true
-	}()
-
 	for {
-		// read data from ffmpeg stdout
-		audiobuf := make([]int16, frameSize*channels)
-		err = binary.Read(buf, binary.LittleEndian, &audiobuf)
-		if err == io.EOF || err == io.ErrUnexpectedEOF {
-			return nil
-		}
-		if err != nil {
-			fmt.Println("error reading from ffmpeg stdout", err)
-			return err
-		}
-
-		// Send received PCM to the sendPCM channel
 		select {
-		case send <- audiobuf:
-		case <-close:
+		case opus := <-chunks:
+			v.OpusSend <- opus
+		case <-encodeClose:
 			return nil
 		}
 	}

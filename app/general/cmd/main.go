@@ -37,6 +37,7 @@ func main() {
 
 	// Register the messageCreate func as a callback for MessageCreate events.
 	dg.AddHandler(handler.TTS)
+	dg.AddHandler(handler.Play)
 	dg.AddHandler(handler.AirHorn(buffer))
 
 	// In this example, we only care about receiving message events.

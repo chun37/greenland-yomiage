@@ -11,11 +11,13 @@ func (h *Handler) Disconnect(s *discordgo.Session, u *discordgo.VoiceStateUpdate
 	if !ok {
 		return
 	}
+
 	g, err := s.State.Guild(vc.GuildID)
 	if err != nil {
 		log.Println("failed to get guild from guild id:", err)
 		return
 	}
+
 	members := func() []*discordgo.Member {
 		ms := make([]*discordgo.Member, 0)
 		for _, vs := range g.VoiceStates {

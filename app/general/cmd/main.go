@@ -44,6 +44,7 @@ func main() {
 
 	hdr := handler.NewHandler(hp, messages)
 	dg.AddHandler(hdr.TTS(messages))
+	dg.AddHandler(hdr.Disconnect)
 
 	spkr := speaker.NewSpeaker(usecases.TTSUsecase, messages)
 	go spkr.Run()

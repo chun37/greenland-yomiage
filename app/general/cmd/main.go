@@ -12,6 +12,7 @@ import (
 	config "github.com/chun37/greenland-yomiage/general/internal/config"
 	"github.com/chun37/greenland-yomiage/general/internal/handler"
 	"github.com/chun37/greenland-yomiage/general/internal/initialize"
+	"github.com/chun37/greenland-yomiage/general/internal/speaker"
 )
 
 // Variables used for command line parameters
@@ -37,10 +38,16 @@ func main() {
 		TargetChannelID: "773181736988573697",
 	}
 	usecases := initialize.NewUsecases()
-	hp := initialize.NewHandlerProps(usecases, cfg)
-	hdr := handler.NewHandler(hp)
-	dg.AddHandler(hdr.TTS)
+	hp := initialize.NewHandlerProps(cfg)
+
+	messages := make(chan speaker.SpeechMessage, 10)
+
+	hdr := handler.NewHandler(hp, messages)
+	dg.AddHandler(hdr.TTS(messages))
 	dg.AddHandler(hdr.Play)
+
+	spkr := speaker.NewSpeaker(usecases.TTSUsecase, messages)
+	go spkr.Run()
 
 	// In this example, we only care about receiving message events.
 	dg.Identify.Intents = discordgo.IntentsAll

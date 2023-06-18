@@ -13,14 +13,6 @@ type command struct {
 func (h *Handler) Interaction(dg *discordgo.Session, guildID string) (func(s *discordgo.Session, i *discordgo.InteractionCreate), []string) {
 	commands := make(map[string]*command)
 
-	commands["basic-command"] = &command{
-		AppCmd: &discordgo.ApplicationCommand{
-			Name:        "basic-command",
-			Description: "Basic command",
-		},
-		Handler: h.BasicCommand,
-	}
-
 	commands["join"] = &command{
 		AppCmd: &discordgo.ApplicationCommand{
 			Name:        "join",

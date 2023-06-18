@@ -39,6 +39,10 @@ func (h *Handler) TTS(messages chan speaker.SpeechMessage) func(s *discordgo.Ses
 			return
 		}
 
+		if !vs.SelfMute || vs.SelfDeaf {
+			return
+		}
+
 		v, err := s.ChannelVoiceJoin(vs.GuildID, vs.ChannelID, false, true)
 		if err != nil {
 			log.Println("failed to join voice channel:", err)

@@ -39,7 +39,7 @@ func (h *Handler) TTS(messages chan speaker.SpeechMessage) func(s *discordgo.Ses
 			return
 		}
 
-		if !vs.SelfMute || vs.SelfDeaf {
+		if !vs.SelfMute || vs.SelfDeaf || vs.Mute {
 			return
 		}
 

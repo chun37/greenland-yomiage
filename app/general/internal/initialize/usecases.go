@@ -2,15 +2,14 @@ package initialize
 
 import (
 	"github.com/chun37/greenland-yomiage/internal/usecase/tts"
-	"github.com/chun37/greenland-yomiage/internal/wavgenerator"
 )
 
 type Usecases struct {
 	TTSUsecase *tts.Usecase
 }
 
-func NewUsecases() Usecases {
+func NewUsecases(dependencies *ExternalDependencies) Usecases {
 	uc := new(Usecases)
-	uc.TTSUsecase = tts.NewUsecase(tts.Dependencies{wavgenerator.NewVoiceVox()})
+	uc.TTSUsecase = tts.NewUsecase(tts.Dependencies{dependencies.VoiceVox})
 	return *uc
 }

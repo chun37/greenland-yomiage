@@ -37,7 +37,8 @@ func main() {
 	cfg := config.Config{
 		TargetChannelID: "773094074269958154",
 	}
-	usecases := initialize.NewUsecases()
+	externalDeps := initialize.NewExternalDependencies()
+	usecases := initialize.NewUsecases(externalDeps)
 	hp := initialize.NewHandlerProps(cfg)
 
 	messages := make(chan speaker.SpeechMessage, 10)

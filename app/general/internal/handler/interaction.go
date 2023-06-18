@@ -1,22 +1,51 @@
 package handler
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"github.com/bwmarrin/discordgo"
+	"github.com/samber/lo"
+)
+
+type command struct {
+	AppCmd  *discordgo.ApplicationCommand
+	Handler func(s *discordgo.Session, i *discordgo.InteractionCreate)
+}
 
 func (h *Handler) Interaction(dg *discordgo.Session, guildID string) (func(s *discordgo.Session, i *discordgo.InteractionCreate), []string) {
-	basicCommand := &discordgo.ApplicationCommand{
-		Name:        "basic-command",
-		Description: "Basic command",
+	commands := make(map[string]*command)
+
+	commands["basic-command"] = &command{
+		AppCmd: &discordgo.ApplicationCommand{
+			Name:        "basic-command",
+			Description: "Basic command",
+		},
+		Handler: h.BasicCommand,
 	}
 
-	createdBasicCommand, err := dg.ApplicationCommandCreate(dg.State.User.ID, guildID, basicCommand)
-	if err != nil {
+	createdCommands := registerCommands(dg, guildID, lo.MapToSlice(commands, func(_ string, value *command) *discordgo.ApplicationCommand {
+		return value.AppCmd
+	}))
 
-	}
+	commandIDs := lo.Map(createdCommands, func(item *discordgo.ApplicationCommand, _ int) string { return item.ID })
 
 	return func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		switch i.ApplicationCommandData().Name {
-		case "basic-command":
-			h.BasicCommand(s, i)
+		c, ok := commands[i.ApplicationCommandData().Name]
+		if !ok {
+			return
 		}
-	}, []string{createdBasicCommand.ID}
+		c.Handler(s, i)
+	}, commandIDs
+}
+
+func registerCommands(dg *discordgo.Session, guildID string, commands []*discordgo.ApplicationCommand) []*discordgo.ApplicationCommand {
+	createdCommands := func() []*discordgo.ApplicationCommand {
+		cmds := make([]*discordgo.ApplicationCommand, 0)
+		for _, cmd := range commands {
+			created, err := dg.ApplicationCommandCreate(dg.State.User.ID, guildID, cmd)
+			if err != nil {
+			}
+			cmds = append(cmds, created)
+		}
+		return cmds
+	}()
+	return createdCommands
 }

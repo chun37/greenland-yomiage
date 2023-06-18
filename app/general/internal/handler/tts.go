@@ -9,15 +9,10 @@ import (
 
 func (h *Handler) TTS(messages chan speaker.SpeechMessage) func(s *discordgo.Session, m *discordgo.MessageCreate) {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate) {
-		if m.Author.ID == s.State.User.ID {
-			return
-		}
-
-		if m.Author.Bot {
-			return
-		}
-
-		if h.props.Config.TargetChannelID != m.ChannelID {
+		// m.Author.ID == s.State.User.ID: 自分のメッセージ
+		// m.Author.Bot: Bot のメッセージ
+		// h.props.Config.TargetChannelID != m.ChannelID: 読み上げチャンネル以外
+		if m.Author.ID == s.State.User.ID || m.Author.Bot || h.props.Config.TargetChannelID != m.ChannelID {
 			return
 		}
 
@@ -35,11 +30,12 @@ func (h *Handler) TTS(messages chan speaker.SpeechMessage) func(s *discordgo.Ses
 			}
 			return nil
 		}()
-		if vs == nil {
-			return
-		}
 
-		if !vs.SelfMute || vs.SelfDeaf || vs.Mute {
+		// vs == nil: VC に参加してない
+		// !vs.SelfMute: ミュートしていない
+		// vs.SelfDeaf: スピーカーミュートしている
+		// vs.Mute: サーバーミュートされている
+		if vs == nil || !vs.SelfMute || vs.SelfDeaf || vs.Mute {
 			return
 		}
 

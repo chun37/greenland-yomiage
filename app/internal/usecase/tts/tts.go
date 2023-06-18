@@ -6,6 +6,7 @@ import (
 
 	"github.com/chun37/greenland-yomiage/internal/opus"
 	"github.com/chun37/greenland-yomiage/internal/wavgenerator"
+	"golang.org/x/xerrors"
 )
 
 type Dependencies struct {
@@ -26,11 +27,10 @@ type UsecaseParam struct {
 	Done       chan struct{}
 }
 
-func (u *Usecase) Do(param UsecaseParam) {
+func (u *Usecase) Do(param UsecaseParam) error {
 	wav, err := u.deps.WavGenerator.Generate(param.Text)
 	if err != nil {
-		log.Println("failed to generate wav:", err)
-		return
+		return xerrors.Errorf("failed to generate wav: %w", err)
 	}
 
 	go func() {
@@ -40,4 +40,6 @@ func (u *Usecase) Do(param UsecaseParam) {
 			return
 		}
 	}()
+
+	return nil
 }

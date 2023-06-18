@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/bwmarrin/discordgo"
 	"golang.org/x/xerrors"
@@ -68,12 +67,11 @@ func (h *Handler) AddWord(s *discordgo.Session, i *discordgo.InteractionCreate) 
 	}
 
 	if err := h.props.DictionaryAddUsecase.Do(word, pronunciation, accentType); err != nil {
-		log.Println("cannot add word to dictionary", err)
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			// Ignore type for now, they will be discussed in "responses"
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "辞書への単語登録に失敗しました。",
+				Content: fmt.Sprintf("辞書への単語登録に失敗しました。\n%s", err),
 			},
 		})
 

@@ -21,6 +21,22 @@ func (h *Handler) Interaction(dg *discordgo.Session, guildID string) (func(s *di
 		Handler: h.BasicCommand,
 	}
 
+	commands["join"] = &command{
+		AppCmd: &discordgo.ApplicationCommand{
+			Name:        "join",
+			Description: "あなたの参加しているボイスチャンネルに参加します。",
+		},
+		Handler: h.Join,
+	}
+
+	commands["leave"] = &command{
+		AppCmd: &discordgo.ApplicationCommand{
+			Name:        "leave",
+			Description: "参加しているボイスチャンネルから退出します。",
+		},
+		Handler: h.Leave,
+	}
+
 	createdCommands := registerCommands(dg, guildID, lo.MapToSlice(commands, func(_ string, value *command) *discordgo.ApplicationCommand {
 		return value.AppCmd
 	}))

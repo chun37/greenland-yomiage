@@ -43,7 +43,7 @@ func main() {
 
 	messages := make(chan speaker.SpeechMessage, 10)
 
-	hdr := handler.NewHandler(hp, messages)
+	hdr := handler.New(hp, messages)
 	dg.AddHandler(hdr.TTS(messages))
 	dg.AddHandler(hdr.Disconnect)
 

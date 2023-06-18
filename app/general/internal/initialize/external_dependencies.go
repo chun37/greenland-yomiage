@@ -12,7 +12,7 @@ func NewExternalDependencies() *ExternalDependencies {
 	externalDependencies := new(ExternalDependencies)
 
 	{
-		externalDependencies.VoiceVox = voicevox.NewVoiceVox()
+		externalDependencies.VoiceVox = voicevox.New()
 	}
 
 	return externalDependencies

@@ -10,6 +10,6 @@ type Usecases struct {
 
 func NewUsecases(dependencies *ExternalDependencies) Usecases {
 	uc := new(Usecases)
-	uc.TTSUsecase = tts.NewUsecase(tts.Dependencies{dependencies.VoiceVox})
+	uc.TTSUsecase = tts.New(tts.Dependencies{dependencies.VoiceVox})
 	return *uc
 }

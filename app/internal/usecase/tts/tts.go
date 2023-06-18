@@ -17,7 +17,7 @@ type Usecase struct {
 	deps Dependencies
 }
 
-func NewUsecase(deps Dependencies) *Usecase {
+func New(deps Dependencies) *Usecase {
 	return &Usecase{deps: deps}
 }
 

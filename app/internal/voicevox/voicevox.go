@@ -15,7 +15,7 @@ type VoiceVox struct {
 	HTTPClient *http.Client
 }
 
-func NewVoiceVox() *VoiceVox {
+func New() *VoiceVox {
 	return &VoiceVox{
 		&http.Client{},
 	}

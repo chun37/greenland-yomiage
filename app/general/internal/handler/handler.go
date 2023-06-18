@@ -10,7 +10,7 @@ type Handler struct {
 	messages chan speaker.SpeechMessage
 }
 
-func NewHandler(props *props.HandlerProps, messages chan speaker.SpeechMessage) *Handler {
+func New(props *props.HandlerProps, messages chan speaker.SpeechMessage) *Handler {
 	return &Handler{
 		props:    props,
 		messages: messages,

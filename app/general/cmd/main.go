@@ -35,7 +35,7 @@ func main() {
 	// Register the messageCreate func as a callback for MessageCreate events.
 
 	cfg := config.Config{
-		TargetChannelID: "773181736988573697",
+		TargetChannelID: "773094074269958154",
 	}
 	usecases := initialize.NewUsecases()
 	hp := initialize.NewHandlerProps(cfg)

@@ -70,12 +70,16 @@ func (v *VoiceVox) getAudioBinary(ctx context.Context, audioQuery []byte) ([]byt
 		}
 	}(res.Body)
 
-	buf, err := io.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, xerrors.Errorf("failed to read res.Body: %w", err)
 	}
 
-	return buf, nil
+	if res.StatusCode != 200 {
+		return nil, xerrors.Errorf("failed to http request: %v", body)
+	}
+
+	return body, nil
 }
 
 func (v *VoiceVox) getAudioQuery(ctx context.Context, text string) ([]byte, error) {
@@ -106,18 +110,14 @@ func (v *VoiceVox) getAudioQuery(ctx context.Context, text string) ([]byte, erro
 		}
 	}(res.Body)
 
-	if res.StatusCode != 200 {
-		body, err := io.ReadAll(res.Body)
-		if err != nil {
-			return nil, xerrors.Errorf("failed to read res.Body: %w", err)
-		}
-		return nil, xerrors.Errorf("failed to http request: %v", body)
-	}
-
-	audioQuery, err := io.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, xerrors.Errorf("failed to read res.Body: %w", err)
 	}
 
-	return audioQuery, nil
+	if res.StatusCode != 200 {
+		return nil, xerrors.Errorf("failed to http request: %v", body)
+	}
+
+	return body, nil
 }

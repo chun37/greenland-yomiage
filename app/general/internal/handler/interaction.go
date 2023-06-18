@@ -29,6 +29,34 @@ func (h *Handler) Interaction(dg *discordgo.Session, guildID string) (func(s *di
 		Handler: h.Leave,
 	}
 
+	commands["add-word"] = &command{
+		AppCmd: &discordgo.ApplicationCommand{
+			Name:        "add-word",
+			Description: "単語の読み方を登録します。",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "word",
+					Description: "単語",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "pronunciation",
+					Description: "読み(カタカナ)",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "accent_type",
+					Description: "アクセント核位置",
+					Required:    true,
+				},
+			},
+		},
+		Handler: h.AddWord,
+	}
+
 	createdCommands := registerCommands(dg, guildID, lo.MapToSlice(commands, func(_ string, value *command) *discordgo.ApplicationCommand {
 		return value.AppCmd
 	}))

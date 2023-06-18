@@ -50,7 +50,7 @@ func main() {
 	}
 	externalDeps := initialize.NewExternalDependencies()
 	usecases := initialize.NewUsecases(externalDeps)
-	hp := initialize.NewHandlerProps(cfg)
+	hp := initialize.NewHandlerProps(cfg, usecases)
 
 	messages := make(chan speaker.SpeechMessage, 10)
 

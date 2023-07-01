@@ -12,6 +12,7 @@ import (
 	config "github.com/chun37/greenland-yomiage/general/internal/config"
 	"github.com/chun37/greenland-yomiage/general/internal/handler"
 	"github.com/chun37/greenland-yomiage/general/internal/initialize"
+	"github.com/chun37/greenland-yomiage/general/internal/listener"
 	"github.com/chun37/greenland-yomiage/general/internal/speaker"
 )
 
@@ -53,16 +54,20 @@ func main() {
 	hp := initialize.NewHandlerProps(cfg, usecases)
 
 	messages := make(chan speaker.SpeechMessage, 10)
+	sounrdPacket := make(chan *discordgo.Packet, 1)
+	speaking := make(chan bool)
 
-	hdr := handler.New(hp, messages)
+	hdr := handler.New(hp, messages, sounrdPacket)
 	dg.AddHandler(hdr.TTS(messages))
 	dg.AddHandler(hdr.Disconnect)
 
-	interactionHandler, slashCommandIDs := hdr.Interaction(dg, GuildID)
+	interactionHandler, _ := hdr.Interaction(dg, GuildID)
 	dg.AddHandler(interactionHandler)
 
-	spkr := speaker.NewSpeaker(usecases.TTSUsecase, messages)
+	spkr := speaker.NewSpeaker(usecases.TTSUsecase, messages, speaking)
+	listener := listener.NewListener(sounrdPacket, speaking)
 	go spkr.Run()
+	go listener.Run()
 
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
@@ -80,12 +85,12 @@ func main() {
 	// 	log.Fatalf("Could not fetch registered commands: %v", err)
 	// }
 
-	for _, scid := range slashCommandIDs {
+	/*for _, scid := range slashCommandIDs {
 		err := dg.ApplicationCommandDelete(dg.State.User.ID, GuildID, scid)
 		if err != nil {
 			log.Panicf("Cannot delete command: %+v", err)
 		}
-	}
+	}*/
 
 	log.Println("Gracefully shutting down.")
 

@@ -10,12 +10,14 @@ import (
 type Speaker struct {
 	usecase  *tts.Usecase
 	messages chan SpeechMessage
+	speaking <-chan bool
 }
 
-func NewSpeaker(usecase *tts.Usecase, messages chan SpeechMessage) *Speaker {
+func NewSpeaker(usecase *tts.Usecase, messages chan SpeechMessage, speaking <-chan bool) *Speaker {
 	return &Speaker{
 		usecase:  usecase,
 		messages: messages,
+		speaking: speaking,
 	}
 }
 
@@ -41,6 +43,7 @@ func (s *Speaker) do(message SpeechMessage) error {
 		Text:       message.Text,
 		OpusChunks: opusChunks,
 		Done:       done,
+		Speaking:   s.speaking,
 	}); err != nil {
 		return xerrors.Errorf("failed to exec usecase: %w", err)
 	}

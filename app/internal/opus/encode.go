@@ -19,7 +19,7 @@ const (
 	maxBytes  int = (frameSize * 2) * 2 // max size of opus data
 )
 
-func Encode(src io.Reader, chunks chan []byte, done chan struct{}) error {
+func Encode(src io.Reader, chunks chan []byte, done chan struct{}, speaking <-chan bool) error {
 	run := exec.Command("ffmpeg", "-i", "pipe:0", "-f", "s16le", "-ar", strconv.Itoa(frameRate), "-ac", strconv.Itoa(channels), "pipe:1")
 	run.Stdin = src
 	dst, err := run.StdoutPipe()

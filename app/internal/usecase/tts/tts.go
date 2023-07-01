@@ -25,6 +25,7 @@ type UsecaseParam struct {
 	Text       string
 	OpusChunks chan []byte
 	Done       chan struct{}
+	Speaking   <-chan bool
 }
 
 func (u *Usecase) Do(param UsecaseParam) error {
@@ -34,7 +35,7 @@ func (u *Usecase) Do(param UsecaseParam) error {
 	}
 
 	go func() {
-		err := opus.Encode(bytes.NewReader(wav), param.OpusChunks, param.Done)
+		err := opus.Encode(bytes.NewReader(wav), param.OpusChunks, param.Done, param.Speaking)
 		if err != nil {
 			log.Println("failed to encode audio:", err)
 			return

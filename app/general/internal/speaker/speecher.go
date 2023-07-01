@@ -2,6 +2,7 @@ package speaker
 
 import (
 	"log"
+	"time"
 
 	"github.com/chun37/greenland-yomiage/internal/usecase/tts"
 	"golang.org/x/xerrors"
@@ -10,22 +11,35 @@ import (
 type Speaker struct {
 	usecase  *tts.Usecase
 	messages chan SpeechMessage
-	speaking <-chan bool
+	quiet    <-chan struct{}
 }
 
-func NewSpeaker(usecase *tts.Usecase, messages chan SpeechMessage, speaking <-chan bool) *Speaker {
+func NewSpeaker(usecase *tts.Usecase, messages chan SpeechMessage, quiet <-chan struct{}) *Speaker {
 	return &Speaker{
 		usecase:  usecase,
 		messages: messages,
-		speaking: speaking,
+		quiet:    quiet,
 	}
 }
 
 func (s *Speaker) Run() {
+	isSpeaking := true
+
 	for {
-		message := <-s.messages
-		if err := s.do(message); err != nil {
-			log.Println("failed to speak message: %+v", err)
+		select {
+		case <-s.quiet:
+			isSpeaking = false
+		case message := <-s.messages:
+			go func() {
+				for isSpeaking {
+					time.Sleep(time.Microsecond)
+				}
+				if err := s.do(message); err != nil {
+					log.Println("failed to speak message: %+v", err)
+				}
+			}()
+		default:
+			isSpeaking = true
 		}
 	}
 }
@@ -43,7 +57,6 @@ func (s *Speaker) do(message SpeechMessage) error {
 		Text:       message.Text,
 		OpusChunks: opusChunks,
 		Done:       done,
-		Speaking:   s.speaking,
 	}); err != nil {
 		return xerrors.Errorf("failed to exec usecase: %w", err)
 	}

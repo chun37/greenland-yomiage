@@ -65,7 +65,6 @@ func (h *Handler) Join(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	go func() {
 		for x := range v.OpusRecv {
-			//log.Printf("x.Opus: %v\n", x.Opus)
 			h.soundPacket <- x
 		}
 	}()

@@ -7,7 +7,7 @@ import (
 	"github.com/chun37/greenland-yomiage/general/internal/speaker"
 )
 
-func (h *Handler) TTS(messages chan speaker.SpeechMessage) func(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (h *Handler) TTS(messages chan speaker.SpeechMessage, x chan struct{}) func(s *discordgo.Session, m *discordgo.MessageCreate) {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate) {
 		// m.Author.ID == s.State.User.ID: 自分のメッセージ
 		// m.Author.Bot: Bot のメッセージ
@@ -35,9 +35,9 @@ func (h *Handler) TTS(messages chan speaker.SpeechMessage) func(s *discordgo.Ses
 		// !vs.SelfMute: ミュートしていない
 		// vs.SelfDeaf: スピーカーミュートしている
 		// vs.Mute: サーバーミュートされている
-		if vs == nil || !vs.SelfMute || vs.SelfDeaf || vs.Mute {
+		/*if vs == nil || !vs.SelfMute || vs.SelfDeaf || vs.Mute {
 			return
-		}
+		}*/
 
 		v, err := s.ChannelVoiceJoin(vs.GuildID, vs.ChannelID, false, true)
 		if err != nil {

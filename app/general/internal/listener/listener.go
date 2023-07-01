@@ -1,28 +1,34 @@
 package listener
 
 import (
+	"time"
+
 	"github.com/bwmarrin/discordgo"
 )
 
 type Listener struct {
 	soundPacket chan *discordgo.Packet
-	speaking    chan bool
+	quiet       chan struct{}
 }
 
-func NewListener(packet chan *discordgo.Packet, speaking chan bool) *Listener {
+func NewListener(packet chan *discordgo.Packet, quiet chan struct{}) *Listener {
 	return &Listener{
 		soundPacket: packet,
-		speaking:    speaking,
+		quiet:       quiet,
 	}
 }
 
 func (l Listener) Run() {
+	lastSoundAt := time.Now()
+
 	for {
 		select {
 		case <-l.soundPacket:
-			l.speaking <- true
+			lastSoundAt = time.Now()
 		default:
-			l.speaking <- false
+			if time.Since(lastSoundAt).Milliseconds() > 200 {
+				l.quiet <- struct{}{}
+			}
 		}
 	}
 }

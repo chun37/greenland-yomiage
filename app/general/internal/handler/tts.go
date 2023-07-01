@@ -35,9 +35,9 @@ func (h *Handler) TTS(messages chan speaker.SpeechMessage, x chan struct{}) func
 		// !vs.SelfMute: ミュートしていない
 		// vs.SelfDeaf: スピーカーミュートしている
 		// vs.Mute: サーバーミュートされている
-		/*if vs == nil || !vs.SelfMute || vs.SelfDeaf || vs.Mute {
+		if vs == nil || !vs.SelfMute || vs.SelfDeaf || vs.Mute {
 			return
-		}*/
+		}
 
 		v, err := s.ChannelVoiceJoin(vs.GuildID, vs.ChannelID, false, true)
 		if err != nil {

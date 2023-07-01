@@ -24,20 +24,26 @@ func NewSpeaker(usecase *tts.Usecase, messages chan SpeechMessage, quiet <-chan 
 
 func (s *Speaker) Run() {
 	isSpeaking := true
+	messages := make([]SpeechMessage, 0)
+
+	go func() {
+		for {
+			for isSpeaking || len(messages) == 0 {
+				time.Sleep(time.Microsecond)
+			}
+			if err := s.do(messages[0]); err != nil {
+				log.Println("failed to speak message: %+v", err)
+			}
+			messages = messages[1:]
+		}
+	}()
 
 	for {
 		select {
 		case <-s.quiet:
 			isSpeaking = false
 		case message := <-s.messages:
-			go func() {
-				for isSpeaking {
-					time.Sleep(time.Microsecond)
-				}
-				if err := s.do(message); err != nil {
-					log.Println("failed to speak message: %+v", err)
-				}
-			}()
+			messages = append(messages, message)
 		default:
 			isSpeaking = true
 		}

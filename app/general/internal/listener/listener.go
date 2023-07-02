@@ -26,7 +26,7 @@ func (l Listener) Run() {
 		case <-l.soundPacket:
 			lastSoundAt = time.Now()
 		default:
-			if time.Since(lastSoundAt).Milliseconds() > 200 {
+			if time.Since(lastSoundAt).Milliseconds() > 500 {
 				l.quiet <- struct{}{}
 			}
 		}

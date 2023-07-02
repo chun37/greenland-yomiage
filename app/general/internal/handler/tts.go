@@ -2,6 +2,7 @@ package handler
 
 import (
 	"log"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/chun37/greenland-yomiage/general/internal/speaker"
@@ -35,15 +36,17 @@ func (h *Handler) TTS(messages chan speaker.SpeechMessage, x chan struct{}) func
 		// !vs.SelfMute: ミュートしていない
 		// vs.SelfDeaf: スピーカーミュートしている
 		// vs.Mute: サーバーミュートされている
-		if vs == nil || !vs.SelfMute || vs.SelfDeaf || vs.Mute {
+		/*if vs == nil || !vs.SelfMute || vs.SelfDeaf || vs.Mute {
 			return
-		}
+		}*/
 
 		v, err := h.joinvc(s, vs.GuildID, vs.ChannelID)
 		if err != nil {
 			log.Println("failed to join voice channel:", err)
 			return
 		}
+
+		time.Sleep(time.Millisecond * 500)
 
 		messages <- speaker.SpeechMessage{v, m.Content}
 	}

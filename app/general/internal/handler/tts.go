@@ -39,7 +39,7 @@ func (h *Handler) TTS(messages chan speaker.SpeechMessage, x chan struct{}) func
 			return
 		}
 
-		v, err := s.ChannelVoiceJoin(vs.GuildID, vs.ChannelID, false, true)
+		v, err := h.joinvc(s, vs.GuildID, vs.ChannelID)
 		if err != nil {
 			log.Println("failed to join voice channel:", err)
 			return

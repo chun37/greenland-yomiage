@@ -39,7 +39,7 @@ func (h *Handler) Join(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
-	v, err := s.ChannelVoiceJoin(vs.GuildID, vs.ChannelID, false, false)
+	v, err := h.joinvc(s, vs.GuildID, vs.ChannelID)
 	if err != nil {
 		log.Println("failed to join voice channel:", err)
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -62,12 +62,6 @@ func (h *Handler) Join(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		})
 		return
 	}
-
-	go func() {
-		for x := range v.OpusRecv {
-			h.soundPacket <- x
-		}
-	}()
 
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,

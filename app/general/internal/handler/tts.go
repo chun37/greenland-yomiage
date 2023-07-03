@@ -46,7 +46,7 @@ func (h *Handler) TTS(messages chan speaker.SpeechMessage, x chan struct{}) func
 			return
 		}
 
-		time.Sleep(time.Millisecond * 500)
+		time.Sleep(time.Millisecond * 200)
 
 		messages <- speaker.SpeechMessage{v, m.Content}
 	}

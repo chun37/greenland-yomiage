@@ -54,10 +54,10 @@ func main() {
 	hp := initialize.NewHandlerProps(cfg, usecases)
 
 	messages := make(chan speaker.SpeechMessage, 10)
-	sounrdPacket := make(chan *discordgo.Packet, 1)
+	soundPacket := make(chan *discordgo.Packet, 1)
 	quiet := make(chan struct{})
 
-	hdr := handler.New(hp, messages, sounrdPacket)
+	hdr := handler.New(hp, messages, soundPacket)
 	dg.AddHandler(hdr.TTS(messages, quiet))
 	dg.AddHandler(hdr.Disconnect)
 
@@ -65,7 +65,7 @@ func main() {
 	dg.AddHandler(interactionHandler)
 
 	spkr := speaker.NewSpeaker(usecases.TTSUsecase, messages, quiet)
-	listener := listener.NewListener(sounrdPacket, quiet)
+	listener := listener.NewListener(soundPacket, quiet)
 	go spkr.Run()
 	go listener.Run()
 

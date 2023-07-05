@@ -39,7 +39,7 @@ func (h *Handler) Join(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
-	v, err := s.ChannelVoiceJoin(vs.GuildID, vs.ChannelID, false, true)
+	v, err := h.joinvc(s, vs.GuildID, vs.ChannelID)
 	if err != nil {
 		log.Println("failed to join voice channel:", err)
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{

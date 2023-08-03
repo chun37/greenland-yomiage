@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -18,38 +17,40 @@ import (
 
 // Variables used for command line parameters
 var (
-	Token   string
-	GuildID string
+	Token            string
+	GuildID          string
+	YomiageChannelID string
 )
 
 func init() {
-	// flag.StringVar(&Token, "t", "", "Bot Token")
-	// flag.StringVar(&GuildID, "g", "", "Slash Commands Guild")
 	Token = os.Getenv("DISCORD_TOKEN")
 	GuildID = os.Getenv("DISCORD_GUILD_ID")
-	flag.Parse()
+	YomiageChannelID = os.Getenv("DISCORD_YOMIAGE_CH_ID")
+
+	if Token != "" {
+		panic("環境変数`DISCORD_TOKEN`がセットされていません")
+	}
+	if GuildID != "" {
+		panic("環境変数`DISCORD_GUILD_ID`がセットされていません")
+	}
+	if YomiageChannelID != "" {
+		panic("環境変数`DISCORD_YOMIAGE_CH_ID`がセットされていません")
+	}
 }
 
 func main() {
-	// Create a new Discord session using the provided bot token.
 	dg, err := discordgo.New("Bot " + Token)
 	if err != nil {
-		log.Fatalf("error creating Discord session,", err)
+		log.Fatalf("認証に失敗しました: %+v\n", err)
 	}
 
-	// In this example, we only care about receiving message events.
 	dg.Identify.Intents = discordgo.IntentsAll
-
-	// Open a websocket connection to Discord and begin listening.
-	err = dg.Open()
-	if err != nil {
-		log.Fatalf("error opening connection,", err)
+	if err := dg.Open(); err != nil {
+		log.Fatalf("コネクションを確立できませんでした: %+v\n", err)
 	}
-
-	// Register the messageCreate func as a callback for MessageCreate events.
 
 	cfg := config.Config{
-		TargetChannelID: "773094074269958154",
+		TargetChannelID: YomiageChannelID,
 	}
 	externalDeps := initialize.NewExternalDependencies()
 	usecases := initialize.NewUsecases(externalDeps)

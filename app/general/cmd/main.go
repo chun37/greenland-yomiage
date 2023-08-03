@@ -27,13 +27,13 @@ func init() {
 	GuildID = os.Getenv("DISCORD_GUILD_ID")
 	YomiageChannelID = os.Getenv("DISCORD_YOMIAGE_CH_ID")
 
-	if Token != "" {
+	if Token == "" {
 		panic("環境変数`DISCORD_TOKEN`がセットされていません")
 	}
-	if GuildID != "" {
+	if GuildID == "" {
 		panic("環境変数`DISCORD_GUILD_ID`がセットされていません")
 	}
-	if YomiageChannelID != "" {
+	if YomiageChannelID == "" {
 		panic("環境変数`DISCORD_YOMIAGE_CH_ID`がセットされていません")
 	}
 }

@@ -1,18 +1,18 @@
 package initialize
 
 import (
-	"github.com/chun37/greenland-yomiage/internal/voicevox"
+	voicevoxcore "github.com/chun37/greenland-yomiage/internal/voicevox_core"
 )
 
 type ExternalDependencies struct {
-	VoiceVox *voicevox.VoiceVox
+	VoiceVox *voicevoxcore.VoiceVoxCore
 }
 
 func NewExternalDependencies() *ExternalDependencies {
 	externalDependencies := new(ExternalDependencies)
 
 	{
-		externalDependencies.VoiceVox = voicevox.New()
+		externalDependencies.VoiceVox = voicevoxcore.New()
 	}
 
 	return externalDependencies

@@ -23,8 +23,10 @@ var (
 )
 
 func init() {
-	flag.StringVar(&Token, "t", "", "Bot Token")
-	flag.StringVar(&GuildID, "g", "", "Slash Commands Guild")
+	// flag.StringVar(&Token, "t", "", "Bot Token")
+	// flag.StringVar(&GuildID, "g", "", "Slash Commands Guild")
+	Token = os.Getenv("DISCORD_TOKEN")
+	GuildID = os.Getenv("DISCORD_GUILD_ID")
 	flag.Parse()
 }
 

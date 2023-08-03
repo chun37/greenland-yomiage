@@ -10,20 +10,33 @@ import (
 type Speaker struct {
 	usecase  *tts.Usecase
 	messages chan SpeechMessage
+	quiet    <-chan struct{}
 }
 
-func NewSpeaker(usecase *tts.Usecase, messages chan SpeechMessage) *Speaker {
+func NewSpeaker(usecase *tts.Usecase, messages chan SpeechMessage, quiet <-chan struct{}) *Speaker {
 	return &Speaker{
 		usecase:  usecase,
 		messages: messages,
+		quiet:    quiet,
 	}
 }
 
 func (s *Speaker) Run() {
+	messages := make([]SpeechMessage, 0)
+
 	for {
-		message := <-s.messages
-		if err := s.do(message); err != nil {
-			log.Println("failed to speak message: %+v", err)
+		select {
+		case <-s.quiet:
+			if len(messages) < 1 {
+				continue
+			}
+			msg := messages[0]
+			messages = messages[1:]
+			if err := s.do(msg); err != nil {
+				log.Println("failed to speak message: %+v", err)
+			}
+		case message := <-s.messages:
+			messages = append(messages, message)
 		}
 	}
 }

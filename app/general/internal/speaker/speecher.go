@@ -33,7 +33,7 @@ func (s *Speaker) Run() {
 			msg := messages[0]
 			messages = messages[1:]
 			if err := s.do(msg); err != nil {
-				log.Println("failed to speak message: %+v", err)
+				log.Printf("failed to speak message: %+v\n", err)
 			}
 		case message := <-s.messages:
 			messages = append(messages, message)

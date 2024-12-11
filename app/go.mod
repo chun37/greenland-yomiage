@@ -4,14 +4,14 @@ go 1.20
 
 require (
 	github.com/bwmarrin/discordgo v0.27.1
+	github.com/samber/lo v1.38.1
+	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 	layeh.com/gopus v0.0.0-20210501142526-1ee02d434e32
 )
 
 require (
 	github.com/gorilla/websocket v1.4.2 // indirect
-	github.com/samber/lo v1.38.1 // indirect
-	golang.org/x/crypto v0.1.0 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
-	golang.org/x/sys v0.5.0 // indirect
-	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
+	golang.org/x/sys v0.28.0 // indirect
 )
